@@ -7,18 +7,18 @@ body #sheld.flexPatch #chat {
     flex-grow: 1;
 }
 
-#extensionTopBarToggleConnectionProfiles.active,
 #extensionTopBarToggleSidebar.active {
     filter: brightness(150%);
 }
-
 
 #extensionSideBar {
     top: 0;
     display: none;
 }
 
-#extensionSideBar.visible,
+#extensionSideBar.visible {
+    display: flex;
+}
 
 body.reduced-motion #extensionSideBar {
     transition: none;
@@ -140,9 +140,6 @@ body.movingUI #extensionTopBar {
     padding-right: 30px;
 }
 
-
-
-
 #extensionTopBarChatName {
     flex: 1;
     cursor: pointer;
@@ -160,18 +157,27 @@ body.movingUI #extensionTopBar {
     padding-right: 20px;
 }
 
-
 @media screen and (max-width: 1000px) {
     /* Keep the toolbar single-row on mobile while respecting host safe-area padding. */
-    #extensionTopBar,
-    
-    #extensionTopBar::-webkit-scrollbar,
-    #extensionConnectionProfiles::-webkit-scrollbar {
+    #extensionTopBar {
+        --extensionSafeInsetLeft: max(var(--tt-inset-left, env(safe-area-inset-left, 0px)), 0px);
+        --extensionSafeInsetRight: max(var(--tt-inset-right, env(safe-area-inset-right, 0px)), 0px);
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        overscroll-behavior-x: contain;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding-left: calc(10px + var(--extensionSafeInsetLeft));
+        padding-right: calc(10px + var(--extensionSafeInsetRight));
+    }
+
+    #extensionTopBar::-webkit-scrollbar {
         display: none;
     }
 
-    #extensionTopBarChatName,
-    
-    
+    #extensionTopBarChatName {
+        flex: 0 0 8.5rem;
+        width: 8.5rem;
     }
-
+}
