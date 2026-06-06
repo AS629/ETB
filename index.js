@@ -9,10 +9,9 @@ const {
     executeSlashCommandsWithOptions,
     Popup,
 } = SillyTavern.getContext();
-import { addJQueryHighlight } from './jquery-highlight.js';
 import { getGroupPastChats } from '../../../group-chats.js';
-import { getPastCharacterChats, animation_duration, animation_easing, getGeneratingApi } from '../../../../script.js';
-import { debounce, timestampToMoment, sortMoments, uuidv4, waitUntilCondition } from '../../../utils.js';
+import { getPastCharacterChats, animation_duration, animation_easing } from '../../../../script.js';
+import { debounce, timestampToMoment, sortMoments, uuidv4 } from '../../../utils.js';
 import { debounce_timeout } from '../../../constants.js';
 import { t } from '../../../i18n.js';
 
@@ -20,7 +19,6 @@ const movingDivs = /** @type {HTMLDivElement} */ (document.getElementById('movin
 const sheld = /** @type {HTMLDivElement} */ (document.getElementById('sheld'));
 const chat = /** @type {HTMLDivElement} */ (document.getElementById('chat'));
 const draggableTemplate = /** @type {HTMLTemplateElement} */ (document.getElementById('generic_draggable_template'));
-const apiBlock = /** @type {HTMLDivElement} */ (document.getElementById('rm_api_block'));
 
 const topBar = document.createElement('div');
 const chatName = document.createElement('select');
@@ -33,7 +31,6 @@ const icons = [
         title: t`Toggle sidebar`,
         onClick: onToggleSidebarClick,
     },
-    
     {
         id: 'extensionTopBarChatManager',
         icon: 'fa-fw fa-solid fa-address-book',
@@ -108,15 +105,12 @@ async function onRenameChatClick() {
 }
 
 function patchSheldIfNeeded() {
-    // Fun fact: sheld is a typo. It should be shell.
-    // It was fixed in OG TAI long ago, but we still have it here.
     if (!sheld) {
         console.error('Sheld not found. Did you finally rename it?');
         return;
     }
 
     const computedStyle = getComputedStyle(sheld);
-    // Alert: We're not in a version that switched sheld to flex yet.
     if (computedStyle.display === 'grid') {
         sheld.classList.add('flexPatch');
     }
@@ -175,11 +169,6 @@ function setChatName(name) {
     }
 }
 
-/**
- * Get list of chat names for a character.
- * @param {string} avatar Avatar name of the character
- * @returns {Promise<string[]>} List of chat names
- */
 async function getListOfCharacterChats(avatar) {
     try {
         const result = await fetch('/api/characters/chats', {
@@ -219,11 +208,6 @@ async function getChatFiles() {
     return [];
 }
 
-    const splitQuery = query.split(/\s|\b/);
-    messages.highlight(splitQuery, options);
-}
-
-
 function addTopBar() {
     chatName.id = 'extensionTopBarChatName';
     topBar.id = 'extensionTopBar';
@@ -251,10 +235,6 @@ function addIcons() {
         }
         if (icon.position === 'right') {
             topBar.appendChild(iconElement);
-            return;
-        }
-        if (icon.position === 'middle') {
-            topBar.insertBefore(iconElement, searchInput);
             return;
         }
         if (icon.id === 'extensionTopBarRenameChat' && typeof renameChat !== 'function') {
@@ -294,22 +274,6 @@ function addSideBar() {
     loaderContainer.appendChild(loaderIcon);
 
     movingDivs.appendChild(draggable);
-}
-
-
-        connectionProfilesSelect.addEventListener('change', async () => {
-            connectionProfilesMainSelect.value = connectionProfilesSelect.value;
-            connectionProfilesMainSelect.dispatchEvent(new Event('change'));
-        });
-        connectionProfilesMainSelect.addEventListener('change', async () => {
-            connectionProfilesSelect.value = connectionProfilesMainSelect.value;
-        });
-        const observer = new MutationObserver(() => {
-            connectionProfilesSelect.innerHTML = connectionProfilesMainSelect.innerHTML;
-            connectionProfilesSelect.value = connectionProfilesMainSelect.value;
-        });
-        observer.observe(connectionProfilesMainSelect, { childList: true });
-    });
 }
 
 async function onToggleSidebarClick() {
@@ -480,84 +444,9 @@ async function onChatNameChange() {
     await openChatById(chatId);
 }
 
-
-    button.classList.toggle('active');
-    connectionProfiles.classList.toggle('visible');
-    savePanelsState();
-    await onOnlineStatusChange();
-}
-
-
-    const connectionProfilesMainSelect = /** @type {HTMLSelectElement} */ (document.getElementById('connection_profiles'));
-    if (connectionProfilesMainSelect) {
-        connectionProfilesSelect.innerHTML = connectionProfilesMainSelect.innerHTML;
-        connectionProfilesSelect.value = connectionProfilesMainSelect.value;
-    } else {
-        connectionProfilesSelect.classList.add('displayNone');
-    }
-
-    if (connectionProfilesStatus.nextElementSibling?.classList?.contains('icon-svg')) {
-        connectionProfilesStatus.nextElementSibling.remove();
-    }
-
-    const { SlashCommandParser, onlineStatus, mainApi } = SillyTavern.getContext();
-
-    if (onlineStatus === 'no_connection') {
-        connectionProfilesStatus.classList.add('offline');
-        connectionProfilesStatus.textContent = t`No connection...`;
-
-        const nullIcon = new Image();
-        nullIcon.classList.add('icon-svg', 'null-icon');
-        connectionProfilesStatus.insertAdjacentElement('afterend', nullIcon);
-        return;
-    }
-
-    async function getCurrentAPI() {
-        let currentAPI = mainApi;
-        try {
-            const commandResult = await SlashCommandParser.commands['api'].callback({ quiet: 'true' }, '');
-            if (commandResult) {
-                currentAPI = commandResult;
-            }
-        } catch (error) {
-            console.error(t`Failed to get current API`, error);
-        }
-        const fancyNameOption = apiBlock.querySelector(`select:not(#main_api) option[value="${currentAPI}"]`) ?? apiBlock.querySelector(`select#main_api option[value="${currentAPI}"]`);
-        if (fancyNameOption) {
-            // Remove text in parentheses or brackets
-            return fancyNameOption.textContent.replace(/[[(].*[\])]/, '').trim();
-        }
-        return currentAPI;
-    }
-
-    async function getCurrentModel() {
-        let currentModel = onlineStatus;
-        try {
-            const commandResult = await SlashCommandParser.commands['model'].callback({ quiet: 'true' }, '');
-            if (commandResult && typeof commandResult === 'string') {
-                currentModel = commandResult;
-            }
-        } catch (error) {
-            console.error(t`Failed to get current model`, error);
-        }
-        const fancyNameOption = apiBlock.querySelector(`option[value="${currentModel}"]`);
-        if (fancyNameOption) {
-            return fancyNameOption.textContent.trim();
-        }
-        return currentModel;
-    }
-
-    const [currentAPI, currentModel] = await Promise.all([getCurrentAPI(), getCurrentModel()]);
-    await addConnectionProfileIcon();
-    connectionProfilesStatus.classList.remove('offline');
-    connectionProfilesStatus.textContent = `${currentAPI} – ${currentModel}`;
-}
-
-
 function savePanelsState() {
     localStorage.setItem('topBarPanelsState', JSON.stringify({
-        sidebarVisible: document.getElementById('extensionSideBar')?.classList.contains('visible'),
-
+        sidebarVisible: document.getElementById('extensionSideBar')?.classList.contains('visible')
     }));
 }
 
@@ -571,12 +460,10 @@ function restorePanelsState() {
     if (state.sidebarVisible) {
         document.getElementById('extensionTopBarToggleSidebar')?.click();
     }
-
 }
 
 // Init extension on load
 (async function () {
-    addJQueryHighlight();
     patchSheldIfNeeded();
     addTopBar();
     addIcons();
