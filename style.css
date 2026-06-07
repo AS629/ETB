@@ -7,8 +7,28 @@ body #sheld.flexPatch #chat {
     flex-grow: 1;
 }
 
+#extensionTopBarToggleConnectionProfiles.active,
 #extensionTopBarToggleSidebar.active {
     filter: brightness(150%);
+}
+
+#extensionConnectionProfiles {
+    display: none;
+    flex-direction: row;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+    align-content: center;
+    align-items: center;
+    width: 100%;
+    border: 1px solid var(--SmartThemeBorderColor);
+    background-color: var(--SmartThemeBlurTintColor);
+    backdrop-filter: blur(var(--SmartThemeBlurStrength));
+    height: calc(var(--bottomFormBlockSize) * 0.75);
+    padding: 0 10px;
+    gap: 10px;
+    margin-top: -1px;
+    font-size: calc(var(--mainFontSize) * 0.9);
+    border-radius: 0 0 10px 10px;
 }
 
 #extensionSideBar {
@@ -16,7 +36,8 @@ body #sheld.flexPatch #chat {
     display: none;
 }
 
-#extensionSideBar.visible {
+#extensionSideBar.visible,
+#extensionConnectionProfiles.visible {
     display: flex;
 }
 
@@ -117,16 +138,16 @@ body.reduced-motion #extensionSideBar {
 #extensionTopBar {
     display: flex;
     flex-direction: row;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     flex-shrink: 0;
     align-content: center;
-    align-items: baseline;
+    align-items: center;
     width: 100%;
     border: 1px solid var(--SmartThemeBorderColor);
     border-radius: 10px 10px 0 0;
     background-color: var(--SmartThemeBlurTintColor);
     backdrop-filter: blur(var(--SmartThemeBlurStrength));
-    height: calc(var(--bottomFormBlockSize) * 2);
+    height: var(--bottomFormBlockSize);
     padding: 0 10px;
     gap: 10px;
     font-size: calc(var(--mainFontSize) * 0.9);
@@ -140,7 +161,31 @@ body.movingUI #extensionTopBar {
     padding-right: 30px;
 }
 
-#extensionTopBarChatName {
+#extensionConnectionProfilesStatus {
+    flex: 1;
+    opacity: 0.8;
+    text-align: right;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    font-size: calc(var(--mainFontSize)* 0.85);
+}
+
+#extensionConnectionProfilesStatus~.null-icon {
+    visibility: hidden;
+}
+
+#extensionConnectionProfilesIcon,
+#extensionConnectionProfilesStatus~.icon-svg {
+    opacity: 0.8;
+}
+
+#extensionConnectionProfilesStatus.offline {
+    font-style: italic;
+    opacity: 0.5;
+}
+
+#extensionConnectionProfilesSelect {
     flex: 1;
     cursor: pointer;
     overflow-x: hidden;
@@ -154,12 +199,50 @@ body.movingUI #extensionTopBar {
     background-repeat: no-repeat;
     background-position: right 6px center;
     background-size: 8px 5px;
+    margin: 0;
+    font-size: calc(var(--mainFontSize)* 0.9);
     padding-right: 20px;
 }
 
+#extensionTopBarChatName {
+    flex: 1;
+    min-width: 0;
+    
+    cursor: pointer;
+    overflow-x: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    
+    opacity: 0.8;
+    background: none;
+    border: 1px solid var(--SmartThemeBorderColor);
+    border-radius: 8px;
+    padding: 8px 30px 8px 10px;
+    
+    background-image: url('/img/down-arrow.svg');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 10px 6px;
+}
+
+#extensionTopBar i.right_menu_button {
+    font-size: 1.5em; 
+    padding: 10px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+#extensionTopBarSearchInput {
+    background-color: transparent;
+    font-size: calc(var(--mainFontSize) * 0.9);
+    opacity: 0.8;
+    max-width: calc(var(--sheldWidth) * 0.2);
+    flex-grow: 1;
+}
+
 @media screen and (max-width: 1000px) {
-    /* Keep the toolbar single-row on mobile while respecting host safe-area padding. */
-    #extensionTopBar {
+    #extensionTopBar,
+    #extensionConnectionProfiles {
         --extensionSafeInsetLeft: max(var(--tt-inset-left, env(safe-area-inset-left, 0px)), 0px);
         --extensionSafeInsetRight: max(var(--tt-inset-right, env(safe-area-inset-right, 0px)), 0px);
         flex-wrap: nowrap;
@@ -172,12 +255,31 @@ body.movingUI #extensionTopBar {
         padding-right: calc(10px + var(--extensionSafeInsetRight));
     }
 
-    #extensionTopBar::-webkit-scrollbar {
+    #extensionTopBar::-webkit-scrollbar,
+    #extensionConnectionProfiles::-webkit-scrollbar {
         display: none;
     }
 
-    #extensionTopBarChatName {
+    #extensionConnectionProfilesSelect {
         flex: 0 0 8.5rem;
         width: 8.5rem;
     }
+
+    #extensionTopBarSearchInput {
+        flex: 0 0 7.5rem;
+        width: 7.5rem;
+        max-width: none;
+    }
+
+    #extensionConnectionProfilesStatus {
+        flex: 0 1 auto;
+        min-width: 0;
+        max-width: 40vw;
+    }
+}
+
+#extensionTopBarSearchInput:placeholder-shown {
+    font-style: italic;
+    opacity: 0.5;
+    border-color: transparent;
 }

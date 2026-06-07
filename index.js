@@ -55,18 +55,6 @@ const icons = [
         onClick: onRenameChatClick,
     },
     {
-        id: 'extensionTopBarDeleteChat',
-        icon: 'fa-fw fa-solid fa-trash',
-        position: 'right',
-        title: t`Delete chat`,
-        onClick: async () => {
-            const confirm = await Popup.show.confirm(t`Are you sure?`);
-            if (confirm) {
-                await executeSlashCommandsWithOptions('/delchat');
-            }
-        },
-    },
-    {
         id: 'extensionTopBarCloseChat',
         icon: 'fa-fw fa-solid fa-times',
         position: 'right',
